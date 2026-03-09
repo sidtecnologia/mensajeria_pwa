@@ -5,7 +5,7 @@ export const businessesConfig = [
     slug_url: 'https://comidarapida.vercel.app',
     supabaseUrl: import.meta.env.VITE_PETER_SB_URL,
     supabaseKey: import.meta.env.VITE_PETER_SB_ANON_KEY,
-    priority: 10
+    priority: 5
   },
   {
     id: 'negocio-2',
@@ -13,6 +13,14 @@ export const businessesConfig = [
     slug_url: 'https://perfumero.vercel.app',
     supabaseUrl: import.meta.env.VITE_PERFUME_SB_URL,
     supabaseKey: import.meta.env.VITE_PERFUME_SB_ANON_KEY,
-    priority: 5
+    priority: 1
+  },
+  {
+    id: 'negocio-3',
+    name: 'Asadero',
+    slug_url: 'https://polloasado.vercel.app',
+    supabaseUrl: import.meta.env.VITE_ASADERO_SB_URL,
+    supabaseKey: import.meta.env.VITE_ASADERO_SB_ANON_KEY,
+    priority: 10
   }
 ];
