@@ -26,7 +26,7 @@ export const businessesConfig = [
 {
   id: 'negocio-4',
   name: 'Pizza Pizza',
-  slug_url: 'https://pizzamenu.vercel.app',
+  slug_url: 'https://menupizza.vercel.app',
   supabaseUrl: import.meta.env.VITE_PIZZA_SB_URL,
   supabaseKey: import.meta.env.VITE_PIZZA_SB_ANON_KEY,
   priority: 10
