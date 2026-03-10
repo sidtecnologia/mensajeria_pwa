@@ -51,7 +51,8 @@ export const SearchProvider = ({ children }) => {
       filtered = filtered.filter(p => 
         p.name.toLowerCase().includes(term) || 
         p.description?.toLowerCase().includes(term) ||
-        p.business_name.toLowerCase().includes(term)
+        p.business_name.toLowerCase().includes(term) ||
+        p.category?.toLowerCase().includes(term)
       );
     }
     setDisplayProducts(filtered);

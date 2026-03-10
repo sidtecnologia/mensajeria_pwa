@@ -53,7 +53,7 @@ const MainContent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
-      <Navbar onSearch={setSearchTerm} />
+      <Navbar onSearch={setSearchTerm} value={searchTerm} />
       
       <main className="w-full mx-auto">
         {isHome && <BannerCarousel images={banners} />}

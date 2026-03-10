@@ -1,6 +1,6 @@
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, X } from 'lucide-react';
 
-const Navbar = ({ onSearch }) => {
+const Navbar = ({ onSearch, value }) => {
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm border-b px-4 py-3">
       <div className="max-w-6xl mx-auto flex flex-col gap-3">
@@ -16,10 +16,19 @@ const Navbar = ({ onSearch }) => {
           </div>
           <input
             type="text"
+            value={value}
             placeholder="Buscar platos, ingredientes o negocios..."
             onChange={(e) => onSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            className="w-full pl-10 pr-10 py-2.5 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
           />
+          {value && (
+            <button
+              onClick={() => onSearch('')}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
     </nav>
