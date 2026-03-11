@@ -22,5 +22,13 @@ export const businessesConfig = [
   supabaseUrl: import.meta.env.VITE_PIZZA_SB_URL,
   supabaseKey: import.meta.env.VITE_PIZZA_SB_ANON_KEY,
   priority: 10
+},
+{
+  id: 'negocio-5',
+  name: 'Saloon 1822',
+  slug_url: 'https://saloon1822.vercel.app',
+  supabaseUrl: import.meta.env.VITE_SALOON_SB_URL,
+  supabaseKey: import.meta.env.VITE_SALOON_SB_ANON_KEY,
+  priority: 1
 }
 ];
