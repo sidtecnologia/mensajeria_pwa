@@ -44,8 +44,8 @@ const MainContent = () => {
   }, [searchTerm, selectedCategory, allProducts]);
 
   const banners = [
-    'https://ndqzyplsiqigsynweihk.supabase.co/storage/v1/object/public/donde_peter/baner/baner1.webp',
-    'https://ndqzyplsiqigsynweihk.supabase.co/storage/v1/object/public/donde_peter/baner/baner2.webp',
+    'https://flqtcvqykladelzvxrue.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
+    'https://ogycxpjbzmynkyivmdsz.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
     'https://ndqzyplsiqigsynweihk.supabase.co/storage/v1/object/public/donde_peter/baner/baner3.webp'
   ];
 
