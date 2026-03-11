@@ -21,7 +21,6 @@ const BusinessLogos = () => {
               <a
                 key={b.id}
                 href={b.slug_url}
-                target="_blank"
                 rel="noopener noreferrer"
                 className="flex-shrink-0 logo-item"
                 aria-label={b.name}
