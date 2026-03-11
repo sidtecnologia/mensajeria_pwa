@@ -3,6 +3,7 @@ import { SearchProvider, useSearch } from './context/SearchContext';
 import Navbar from './components/Navbar';
 import ProductCard from './components/ProductCard';
 import BannerCarousel from './components/BannerCarousel';
+import BusinessLogos from './components/BusinessLogos';
 import { Loader2, Sparkles } from 'lucide-react';
 
 const Categories = ({ categories, selected, onSelect }) => (
@@ -44,9 +45,9 @@ const MainContent = () => {
   }, [searchTerm, selectedCategory, allProducts]);
 
   const banners = [
-    'https://flqtcvqykladelzvxrue.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
-    'https://ogycxpjbzmynkyivmdsz.supabase.co/storage/v1/object/public/images/baner/baner2.webp',
-    'https://ndqzyplsiqigsynweihk.supabase.co/storage/v1/object/public/donde_peter/baner/baner3.webp'
+    'https://ogycxpjbzmynkyivmdsz.supabase.co/storage/v1/object/public/images/baner/banerq.webp',
+    'https://ndqzyplsiqigsynweihk.supabase.co/storage/v1/object/public/donde_peter/baner/baner2.webp',
+    'https://flqtcvqykladelzvxrue.supabase.co/storage/v1/object/public/images/baner/baner3.webp'
   ];
 
   const isHome = !searchTerm && selectedCategory === 'Todo';
@@ -57,7 +58,8 @@ const MainContent = () => {
       
       <main className="w-full mx-auto">
         {isHome && <BannerCarousel images={banners} />}
-        
+        {isHome && <BusinessLogos />}
+
         <div className="max-w-6xl mx-auto">
           <Categories
             categories={categories}
