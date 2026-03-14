@@ -19,6 +19,8 @@ export const SearchProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const excludedCategories = ['Aderezo', 'Adicional'];
+
   const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
 
   const generateHomeLayout = (productsPool) => {
@@ -33,7 +35,7 @@ export const SearchProvider = ({ children }) => {
     });
 
     const homeProducts = Object.values(categoriesMap).flat();
-    return shuffle(homeProducts).slice(0, 20);
+    return shuffle(homeProducts).slice(0, 24);
   };
 
   const searchProducts = async (searchTerm = '', category = 'Todo') => {
@@ -66,7 +68,7 @@ export const SearchProvider = ({ children }) => {
           .from('products')
           .select('id, name, description, price, image, category, stock, isOffer, featured')
           .gt('stock', 0)
-          .limit(80);
+          .limit(100);
         
         return (data || []).map(p => ({
           ...p,
@@ -78,7 +80,10 @@ export const SearchProvider = ({ children }) => {
       });
 
       const results = await Promise.allSettled(promises);
-      const loaded = results.filter(r => r.status === 'fulfilled').flatMap(r => r.value);
+      const loaded = results
+        .filter(r => r.status === 'fulfilled')
+        .flatMap(r => r.value)
+        .filter(p => !excludedCategories.includes(p.category));
 
       setAllProducts(loaded);
       setDisplayProducts(generateHomeLayout(loaded));

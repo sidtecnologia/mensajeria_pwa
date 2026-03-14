@@ -37,14 +37,18 @@ const MainContent = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todo');
 
   const categories = useMemo(() => {
+    const excluded = ['Aderezo', 'Adicional'];
     const cats = [...new Set(allProducts.map(p => p.category))];
-    return cats.filter(Boolean).sort();
+    return cats
+      .filter(cat => cat && !excluded.includes(cat))
+      .sort();
   }, [allProducts]);
 
   const randomCategories = useMemo(() => {
-    if (categories.length < 2) return [];
-    return [...categories].sort(() => 0.5 - Math.random()).slice(0, 2);
-  }, [categories, allProducts]);
+    if (categories.length === 0) return [];
+    const shuffled = [...categories].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  }, [categories]);
 
   useEffect(() => {
     searchProducts(searchTerm, selectedCategory);
@@ -67,6 +71,8 @@ const MainContent = () => {
     return result;
   }, [products]);
 
+  const middleIndex = Math.floor(rows.length / 2);
+
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
       <Navbar onSearch={setSearchTerm} value={searchTerm} />
@@ -86,7 +92,7 @@ const MainContent = () => {
             {loading && allProducts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 text-primary">
                 <Loader2 className="animate-spin w-12 h-12" />
-                <p className="font-bold animate-pulse text-lg">Cargando delicias...</p>
+                <p className="font-bold animate-pulse text-lg">Cargando...</p>
               </div>
             ) : error ? (
               <div className="text-center py-20 text-red-500 font-bold bg-white rounded-2xl shadow-sm">{error}</div>
@@ -95,7 +101,7 @@ const MainContent = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-extrabold text-gray-800 flex items-center gap-2">
                     {isHome ? (
-                      <><Sparkles className="text-yellow-500 w-5 h-5" /> Recomendados para ti</>
+                      <><Sparkles className="text-yellow-500 w-5 h-5" /> Recomendados del Día</>
                     ) : (
                       `Encontramos ${products.length} opciones`
                     )}
@@ -108,6 +114,14 @@ const MainContent = () => {
                   </div>
                 ) : (
                   <div className="flex flex-col">
+                    
+                    {isHome && randomCategories[0] && (
+                      <HorizontalCategory 
+                        category={randomCategories[0]} 
+                        allProducts={allProducts} 
+                      />
+                    )}
+
                     {rows.map((row, index) => (
                       <div key={`row-container-${index}`}>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
@@ -116,14 +130,7 @@ const MainContent = () => {
                           ))}
                         </div>
 
-                        {isHome && index === 2 && randomCategories[0] && (
-                          <HorizontalCategory 
-                            category={randomCategories[0]} 
-                            allProducts={allProducts} 
-                          />
-                        )}
-
-                        {isHome && index === rows.length - 3 && randomCategories[1] && (
+                        {isHome && index === middleIndex && randomCategories[1] && rows.length > 1 && (
                           <HorizontalCategory 
                             category={randomCategories[1]} 
                             allProducts={allProducts} 
@@ -131,6 +138,13 @@ const MainContent = () => {
                         )}
                       </div>
                     ))}
+
+                    {isHome && randomCategories[2] && (
+                      <HorizontalCategory 
+                        category={randomCategories[2]} 
+                        allProducts={allProducts} 
+                      />
+                    )}
                   </div>
                 )}
               </>
