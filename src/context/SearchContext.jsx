@@ -65,7 +65,8 @@ export const SearchProvider = ({ children }) => {
         const { data } = await business.client
           .from('products')
           .select('id, name, description, price, image, category, stock, isOffer, featured')
-          .gt('stock', 0);
+          .gt('stock', 0)
+          .limit(80);
         
         return (data || []).map(p => ({
           ...p,

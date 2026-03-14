@@ -6,13 +6,12 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: '#2769f4', // Tu color azul de identidad
-        secondary: '#1a1a1a',
-      },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'], // Tu fuente actual
-      }
+        sans: ['Poppins', 'sans-serif'],
+      },
+      colors: {
+        primary: '#E11D48', // Asegúrate de tener definido tu color primario aquí
+      },
     },
   },
   plugins: [],

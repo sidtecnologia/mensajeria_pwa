@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import ProductCard from './components/ProductCard';
 import BannerCarousel from './components/BannerCarousel';
 import BusinessLogos from './components/BusinessLogos';
+import HorizontalCategory from './components/HorizontalCategory';
 import { Loader2, Sparkles } from 'lucide-react';
 
 const Categories = ({ categories, selected, onSelect }) => (
@@ -40,6 +41,11 @@ const MainContent = () => {
     return cats.filter(Boolean).sort();
   }, [allProducts]);
 
+  const randomCategories = useMemo(() => {
+    if (categories.length < 2) return [];
+    return [...categories].sort(() => 0.5 - Math.random()).slice(0, 2);
+  }, [categories, allProducts]);
+
   useEffect(() => {
     searchProducts(searchTerm, selectedCategory);
   }, [searchTerm, selectedCategory, allProducts]);
@@ -51,6 +57,15 @@ const MainContent = () => {
   ];
 
   const isHome = !searchTerm && selectedCategory === 'Todo';
+
+  const rows = useMemo(() => {
+    const size = 8;
+    const result = [];
+    for (let i = 0; i < products.length; i += size) {
+      result.push(products.slice(i, i + size));
+    }
+    return result;
+  }, [products]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
@@ -71,7 +86,7 @@ const MainContent = () => {
             {loading && allProducts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 text-primary">
                 <Loader2 className="animate-spin w-12 h-12" />
-                <p className="font-bold animate-pulse">Cocinando resultados...</p>
+                <p className="font-bold animate-pulse text-lg">Cargando delicias...</p>
               </div>
             ) : error ? (
               <div className="text-center py-20 text-red-500 font-bold bg-white rounded-2xl shadow-sm">{error}</div>
@@ -80,21 +95,41 @@ const MainContent = () => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-extrabold text-gray-800 flex items-center gap-2">
                     {isHome ? (
-                      <><Sparkles className="text-yellow-500 w-5 h-5" /> Sugerencias del día</>
+                      <><Sparkles className="text-yellow-500 w-5 h-5" /> Recomendados para ti</>
                     ) : (
-                      `Encontramos ${products.length} productos`
+                      `Encontramos ${products.length} opciones`
                     )}
                   </h2>
                 </div>
 
                 {products.length === 0 ? (
-                  <div className="text-center py-20 text-gray-400 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-                    No hay productos que coincidan con tu búsqueda.
+                  <div className="text-center py-20 text-gray-400 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                    No encontramos lo que buscas, intenta con otra palabra.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                    {products.map(p => (
-                      <ProductCard key={`${p.business_id}-${p.id}`} product={p} />
+                  <div className="flex flex-col">
+                    {rows.map((row, index) => (
+                      <div key={`row-container-${index}`}>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                          {row.map(p => (
+                            <ProductCard key={`${p.business_id}-${p.id}`} product={p} />
+                          ))}
+                        </div>
+
+                        {isHome && index === 2 && randomCategories[0] && (
+                          <HorizontalCategory 
+                            category={randomCategories[0]} 
+                            allProducts={allProducts} 
+                          />
+                        )}
+
+                        {isHome && index === rows.length - 3 && randomCategories[1] && (
+                          <HorizontalCategory 
+                            category={randomCategories[1]} 
+                            allProducts={allProducts} 
+                          />
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
