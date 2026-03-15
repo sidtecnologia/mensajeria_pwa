@@ -7,6 +7,7 @@
     
     <title>T! Traigo | Domicilios y Menús en Socorro, Santander</title>
     <meta name="description" content="Pide comida de los mejores restaurantes en Socorro. Menú centralizado, entrega rápida y el mejor servicio con T! Traigo." />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="keywords" content="domicilios Socorro, restaurantes Socorro Santander, T! Traigo, pedir comida Socorro, traigocomida" />
     
     <meta property="og:type" content="website" />
@@ -64,5 +65,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registrado', reg))
+      .catch(err => console.log('SW error', err));
+  });
+}</script>
   </body>
 </html>
