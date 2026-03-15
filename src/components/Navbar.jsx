@@ -2,7 +2,7 @@ import { Search, MapPin, X } from 'lucide-react';
 
 const Navbar = ({ onSearch, value }) => {
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b px-4 py-3">
+    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b px-3 py-2">
       <div className="max-w-6xl mx-auto flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-primary font-bold text-xl">
