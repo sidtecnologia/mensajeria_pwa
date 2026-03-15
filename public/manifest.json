@@ -4,7 +4,7 @@
   "icons": [
     {
       "src": "https://traigocomida.vercel.app/og-image.jpg",
-      "sizes": "192x192",
+      "sizes": "250x250",
       "type": "image/jpg",
       "purpose": "any maskable"
     },
