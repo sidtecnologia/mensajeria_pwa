@@ -5,6 +5,8 @@ import ProductCard from './components/ProductCard';
 import BannerCarousel from './components/BannerCarousel';
 import BusinessLogos from './components/BusinessLogos';
 import HorizontalCategory from './components/HorizontalCategory';
+import InstallToast from './components/InstallToast';
+import { usePWAInstall } from './hooks/usePWAInstall';
 import { Loader2, Sparkles } from 'lucide-react';
 
 const Categories = ({ categories, selected, onSelect }) => (
@@ -33,6 +35,7 @@ const Categories = ({ categories, selected, onSelect }) => (
 
 const MainContent = () => {
   const { products, loading, error, searchProducts, allProducts } = useSearch();
+  const { isVisible, handleInstall, closeToast } = usePWAInstall();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todo');
 
@@ -60,7 +63,6 @@ const MainContent = () => {
     'https://flqtcvqykladelzvxrue.supabase.co/storage/v1/object/public/images/baner/baner3.webp',
     'https://nqjdtwocsnruptnkaucd.supabase.co/storage/v1/object/public/images/baner/baner1.webp',
     'https://nqjdtwocsnruptnkaucd.supabase.co/storage/v1/object/public/imagenes/t_traigo.jpg'
-
   ];
 
   const isHome = !searchTerm && selectedCategory === 'Todo';
@@ -77,7 +79,7 @@ const MainContent = () => {
   const middleIndex = Math.floor(rows.length / 2);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
+    <div className="min-h-screen bg-gray-50 pb-10 font-sans">
       <Navbar onSearch={setSearchTerm} value={searchTerm} />
       
       <main className="w-full mx-auto">
@@ -155,6 +157,12 @@ const MainContent = () => {
           </div>
         </div>
       </main>
+
+      <InstallToast 
+        isVisible={isVisible} 
+        onInstall={handleInstall} 
+        onClose={closeToast} 
+      />
     </div>
   );
 };
