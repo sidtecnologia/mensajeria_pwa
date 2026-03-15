@@ -1,13 +1,17 @@
-import { Search, MapPin, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 const Navbar = ({ onSearch, value }) => {
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b px-3 py-2">
-      <div className="max-w-6xl mx-auto flex flex-col gap-3">
+    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b px-4 py-3">
+      <div className="max-w-4xl mx-auto flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-primary font-bold text-xl">
-            <MapPin className="w-6 h-6" />
-            <span>Catálogo de Comidas | El Socorro</span>
+            <img 
+              src="https://nqjdtwocsnruptnkaucd.supabase.co/storage/v1/object/public/imagenes/t_traigo.png" 
+              alt="Logo" 
+              className="h-10 w-auto object-contain"
+            />
+            <span>| Catálogo de Comidas</span>
           </div>
         </div>
         <div className="relative">

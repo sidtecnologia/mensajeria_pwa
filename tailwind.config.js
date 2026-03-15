@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#2769f4', // Tu color azul de identidad
+        primary: '#0c6839', // Tu color primario de identidad
         secondary: '#1a1a1a',
       },
       fontFamily: {
