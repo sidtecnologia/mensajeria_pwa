@@ -1,4 +1,4 @@
-const CACHE_NAME = 't-traigo-v1.1.5';
+const CACHE_NAME = 't-traigo-v1.1.6';
 const urlsToCache = [
   '/',
   '/index.html',
