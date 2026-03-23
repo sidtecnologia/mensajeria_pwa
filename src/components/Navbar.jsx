@@ -11,7 +11,7 @@ const Navbar = ({ onSearch, value }) => {
               alt="Logo" 
               className="h-10 w-auto object-contain"
             />
-            <span>| Catálogo de Comidas</span>
+            <span>| Comidas</span>
           </div>
         </div>
         <div className="relative">
