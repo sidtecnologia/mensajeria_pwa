@@ -13,7 +13,7 @@ export const businessesConfig = [
     slug_url: 'https://polloasado.vercel.app',
     supabaseUrl: import.meta.env.VITE_ASADERO_SB_URL,
     supabaseKey: import.meta.env.VITE_ASADERO_SB_ANON_KEY,
-    priority: 10
+    priority: 5
   },
 {
   id: 'negocio-3',
@@ -21,7 +21,7 @@ export const businessesConfig = [
   slug_url: 'https://menupizza.vercel.app',
   supabaseUrl: import.meta.env.VITE_PIZZA_SB_URL,
   supabaseKey: import.meta.env.VITE_PIZZA_SB_ANON_KEY,
-  priority: 10
+  priority: 1
 },
 {
   id: 'negocio-4',
@@ -37,6 +37,14 @@ export const businessesConfig = [
   slug_url: 'https://hamburguesaseltablon.vercel.app',
   supabaseUrl: import.meta.env.VITE_TABLON_SB_URL,
   supabaseKey: import.meta.env.VITE_TABLON_SB_ANON_KEY,
+  priority: 10
+},
+{
+  id: 'negocio-6',
+  name: 'Callejeros',
+  slug_url: 'https://callejerossocorro.vercel.app',
+  supabaseUrl: import.meta.env.VITE_CALLEJEROS_SB_URL,
+  supabaseKey: import.meta.env.VITE_CALLEJEROS_SB_ANON_KEY,
   priority: 10
 }
 ];
