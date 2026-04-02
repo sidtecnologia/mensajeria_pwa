@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { SearchProvider, useSearch } from './context/SearchContext'
 import Navbar from './components/Navbar'
 import ProductCard from './components/ProductCard'
@@ -44,12 +44,16 @@ const MainContent = () => {
   }, [allProducts])
 
   const sections = useMemo(() => {
+    if (categories.length === 0) return []
     return [...categories].sort(() => 0.5 - Math.random()).slice(0, 2)
   }, [categories])
 
   useEffect(() => {
-    searchProducts(searchTerm, selectedCategory)
-  }, [searchTerm, selectedCategory, allProducts, searchProducts])
+    const handler = setTimeout(() => {
+      searchProducts(searchTerm, selectedCategory)
+    }, 150)
+    return () => clearTimeout(handler)
+  }, [searchTerm, selectedCategory, searchProducts])
 
   const isHome = !searchTerm && selectedCategory === 'Todo'
   
@@ -62,24 +66,35 @@ const MainContent = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
       <Navbar onSearch={setSearchTerm} value={searchTerm} />
+      
       <main>
         {isHome && <BannerCarousel images={banners} />}
         {isHome && <BusinessLogos />}
+
         <div className="max-w-6xl mx-auto px-4 mt-4">
           <Categories categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
+
           {loading && allProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-32 text-primary gap-4">
               <Loader2 className="animate-spin w-10 h-10" />
-              <p className="font-black text-sm animate-pulse uppercase tracking-widest text-center">Cargando...</p>
+              <p className="font-black text-sm animate-pulse uppercase tracking-widest text-center">Cargando catálogo...</p>
             </div>
           ) : error ? (
-            <div className="text-center py-20 text-red-500 font-bold bg-white rounded-3xl shadow-sm border border-red-50">{error}</div>
+            <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-red-50 px-6">
+              <p className="text-red-500 font-bold mb-2 uppercase tracking-tighter">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="text-xs bg-gray-100 px-4 py-2 rounded-lg font-black uppercase"
+              >
+                Reintentar
+              </button>
+            </div>
           ) : (
             <div className="mt-6">
               <h2 className="text-xl font-black text-gray-800 flex items-center gap-3 mb-6 uppercase tracking-tighter">
                 {isHome ? (
                   <>
-                    <div className="bg-orange-100 p-1.5 rounded-lg">
+                    <div className="bg-orange-100 p-1.5 rounded-lg shadow-sm">
                       <Flame className="text-orange-600 w-5 h-5 fill-orange-600" />
                     </div>
                     RECOMENDADOS
@@ -88,22 +103,41 @@ const MainContent = () => {
                   `RESULTADOS (${products.length})`
                 )}
               </h2>
+
               <div className="flex flex-col">
-                {isHome && sections[0] && <HorizontalCategory category={sections[0]} allProducts={allProducts} />}
+                {isHome && sections[0] && (
+                  <HorizontalCategory category={sections[0]} allProducts={allProducts} />
+                )}
+
                 {rows.map((row, idx) => (
                   <div key={`row-chunk-${idx}`}>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
-                      {row.map(p => <ProductCard key={`${p.business_id}-${p.id}`} product={p} />)}
+                      {row.map(p => (
+                        <ProductCard key={`${p.business_id}-${p.id}`} product={p} />
+                      ))}
                     </div>
-                    {isHome && idx === 0 && sections[1] && <HorizontalCategory category={sections[1]} allProducts={allProducts} />}
+                    {isHome && idx === 0 && sections[1] && (
+                      <HorizontalCategory category={sections[1]} allProducts={allProducts} />
+                    )}
                   </div>
                 ))}
+
+                {products.length === 0 && (
+                  <div className="text-center py-20">
+                    <p className="text-gray-400 font-bold uppercase text-sm tracking-widest">No se encontraron productos</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
       </main>
-      <InstallToast isVisible={isVisible} onInstall={handleInstall} onClose={closeToast} />
+
+      <InstallToast 
+        isVisible={isVisible} 
+        onInstall={handleInstall} 
+        onClose={closeToast} 
+      />
     </div>
   )
 }
@@ -114,4 +148,4 @@ const App = () => (
   </SearchProvider>
 )
 
-export default App;
+export default App

@@ -1,37 +1,38 @@
-import { Download } from 'lucide-react';
+import { Download, X } from 'lucide-react'
 
 const InstallToast = ({ isVisible, onInstall, onClose }) => {
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   return (
-    <div className="fixed bottom-6 left-4 right-4 z-[100] md:left-auto md:right-6 md:w-96 animate-in fade-in slide-in-from-bottom-10 duration-700">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4">
-        <div className="bg-[#0c6839]/10 p-3 rounded-xl">
-          <Download className="w-6 h-6 text-[#0c6839]" />
+    <div className="fixed bottom-6 left-4 right-4 z-[100] animate-in fade-in slide-in-from-bottom-10 duration-500">
+      <div className="max-w-md mx-auto bg-gray-900 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between border border-white/10 backdrop-blur-lg">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary p-2 rounded-xl">
+            <Download className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-black uppercase tracking-tight">Instala T! Traigo</p>
+            <p className="text-[11px] text-gray-400">Pide más rápido desde tu pantalla de inicio</p>
+          </div>
         </div>
         
-        <div className="flex-grow">
-          <h4 className="text-sm font-bold text-gray-900">¿Instalar App?</h4>
-          <p className="text-xs text-gray-500">Accede más rápido y pide tus comidas favoritas.</p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <button
+        <div className="flex items-center gap-2">
+          <button 
             onClick={onInstall}
-            className="bg-[#0c6839] text-white text-xs font-bold px-4 py-2 rounded-lg hover:brightness-110 transition-all active:scale-95"
+            className="bg-white text-black text-[11px] font-black px-4 py-2 rounded-lg uppercase hover:bg-gray-200 active:scale-95 transition-all"
           >
             Instalar
           </button>
-          <button
+          <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xs font-semibold py-1 transition-colors"
+            className="p-2 text-gray-500 hover:text-white transition-colors"
           >
-            Luego
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default InstallToast;
+export default InstallToast
