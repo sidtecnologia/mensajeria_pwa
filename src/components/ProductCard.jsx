@@ -1,18 +1,24 @@
-const ProductCard = ({ product }) => {
+import { memo } from 'react'
+
+const ProductCard = memo(({ product }) => {
   const isOutOfStock = product.stock <= 0
 
-  const handleClick = () => {
-    if (isOutOfStock) return
-    const url = new URL(product.business_url)
-    url.searchParams.set('p', product.id)
-    window.location.href = url.toString()
-  }
+  const url = (() => {
+    try {
+      const u = new URL(product.business_url)
+      u.searchParams.set('p', product.id)
+      return u.toString()
+    } catch {
+      return product.business_url
+    }
+  })()
 
   return (
-    <div 
-      onClick={handleClick}
+    <a
+      href={isOutOfStock ? undefined : url}
+      aria-disabled={isOutOfStock}
       className={`relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col transition-all duration-300 ${
-        isOutOfStock ? 'opacity-60 grayscale-[80%]' : 'cursor-pointer hover:shadow-lg'
+        isOutOfStock ? 'opacity-60 grayscale-[80%] pointer-events-none' : 'hover:shadow-lg cursor-pointer'
       }`}
     >
       <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
@@ -34,15 +40,17 @@ const ProductCard = ({ product }) => {
         </span>
       </div>
 
-      <div className="relative aspect-square overflow-hidden">
-        <img 
-          src={product.image?.[0] || '/img/placeholder.png'} 
-          className="w-full h-full object-cover" 
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        <img
+          src={product.image?.[0] || '/img/placeholder.png'}
+          className="w-full h-full object-cover"
           alt={product.name}
           loading="lazy"
+          decoding="async"
+          onError={(e) => { e.currentTarget.src = '/img/placeholder.png' }}
         />
       </div>
-      
+
       <div className="p-3 flex flex-col flex-grow">
         <h3 className="font-bold text-sm text-gray-800 line-clamp-1 uppercase tracking-tight">{product.name}</h3>
         <p className="text-gray-500 text-[10px] mt-1 line-clamp-2 flex-grow leading-tight">
@@ -55,8 +63,10 @@ const ProductCard = ({ product }) => {
           {isOutOfStock && <span className="text-[9px] text-red-500 font-bold uppercase">Agotado</span>}
         </div>
       </div>
-    </div>
+    </a>
   )
-}
+})
+
+ProductCard.displayName = 'ProductCard'
 
 export default ProductCard

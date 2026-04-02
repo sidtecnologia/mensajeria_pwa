@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import { useSearch } from '../context/SearchContext'
 
-const BusinessLogos = () => {
+const BusinessLogos = memo(() => {
   const { businesses, loading } = useSearch()
 
   if (loading || !businesses || businesses.length === 0) return null
@@ -15,8 +16,12 @@ const BusinessLogos = () => {
                 <img
                   src={b.logo_url || '/img/placeholder.png'}
                   alt={b.name}
+                  width={64}
+                  height={64}
                   className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm group-hover:border-primary transition-all"
-                  onError={(e) => { e.target.src = '/img/placeholder.png' }}
+                  onError={(e) => { e.currentTarget.src = '/img/placeholder.png' }}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">
@@ -28,6 +33,8 @@ const BusinessLogos = () => {
       </div>
     </div>
   )
-}
+})
+
+BusinessLogos.displayName = 'BusinessLogos'
 
 export default BusinessLogos

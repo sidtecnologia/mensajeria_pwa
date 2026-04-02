@@ -1,14 +1,17 @@
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from './ProductCard'
+import { stableShuffle } from '../utils/shuffle'
 
-const HorizontalCategory = ({ category, allProducts }) => {
+const HorizontalCategory = ({ category, allProducts, seed = 0 }) => {
   const scrollRef = useRef(null)
 
-  const categoryProducts = allProducts
-    .filter(p => p.category === category)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 12)
+  const categoryProducts = useMemo(() => {
+    return stableShuffle(
+      allProducts.filter(p => p.category === category),
+      seed
+    ).slice(0, 12)
+  }, [allProducts, category, seed])
 
   if (categoryProducts.length === 0) return null
 
@@ -30,14 +33,15 @@ const HorizontalCategory = ({ category, allProducts }) => {
           </h3>
         </div>
 
-        <button 
+        <button
           onClick={() => scroll('left')}
+          aria-label="Anterior"
           className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white shadow-xl border border-gray-100 rounded-full p-2 hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all active:scale-90"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div 
+        <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide touch-scroll scroll-smooth px-2"
         >
@@ -48,8 +52,9 @@ const HorizontalCategory = ({ category, allProducts }) => {
           ))}
         </div>
 
-        <button 
+        <button
           onClick={() => scroll('right')}
+          aria-label="Siguiente"
           className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white shadow-xl border border-gray-100 rounded-full p-2 hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all active:scale-90"
         >
           <ChevronRight className="w-5 h-5" />

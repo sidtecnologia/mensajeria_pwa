@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { SearchProvider, useSearch } from './context/SearchContext'
 import Navbar from './components/Navbar'
 import ProductCard from './components/ProductCard'
@@ -7,7 +7,8 @@ import BusinessLogos from './components/BusinessLogos'
 import HorizontalCategory from './components/HorizontalCategory'
 import InstallToast from './components/InstallToast'
 import { usePWAInstall } from './hooks/usePWAInstall'
-import { Loader2, Flame } from 'lucide-react'
+import { stableShuffle, getSessionSeed } from './utils/shuffle'
+import { Loader2, Flame, ChevronDown } from 'lucide-react'
 
 const Categories = ({ categories, selected, onSelect }) => (
   <div className="flex gap-3 overflow-x-auto pb-4 pt-2 px-4 scrollbar-hide">
@@ -34,10 +35,11 @@ const Categories = ({ categories, selected, onSelect }) => (
 )
 
 const MainContent = () => {
-  const { products, banners, loading, error, searchProducts, allProducts } = useSearch()
+  const { products, banners, loading, loadingMore, error, searchProducts, allProducts, loadMore, pagination } = useSearch()
   const { isVisible, handleInstall, closeToast } = usePWAInstall()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todo')
+  const seedRef = useRef(getSessionSeed())
 
   const categories = useMemo(() => {
     return [...new Set(allProducts.map(p => p.category))].filter(Boolean).sort()
@@ -45,18 +47,18 @@ const MainContent = () => {
 
   const sections = useMemo(() => {
     if (categories.length === 0) return []
-    return [...categories].sort(() => 0.5 - Math.random()).slice(0, 2)
+    return stableShuffle(categories, seedRef.current).slice(0, 2)
   }, [categories])
 
   useEffect(() => {
     const handler = setTimeout(() => {
       searchProducts(searchTerm, selectedCategory)
-    }, 150)
+    }, 200)
     return () => clearTimeout(handler)
   }, [searchTerm, selectedCategory, searchProducts])
 
   const isHome = !searchTerm && selectedCategory === 'Todo'
-  
+
   const rows = useMemo(() => {
     const res = []
     for (let i = 0; i < products.length; i += 8) res.push(products.slice(i, i + 8))
@@ -66,7 +68,7 @@ const MainContent = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
       <Navbar onSearch={setSearchTerm} value={searchTerm} />
-      
+
       <main>
         {isHome && <BannerCarousel images={banners} />}
         {isHome && <BusinessLogos />}
@@ -82,7 +84,7 @@ const MainContent = () => {
           ) : error ? (
             <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-red-50 px-6">
               <p className="text-red-500 font-bold mb-2 uppercase tracking-tighter">{error}</p>
-              <button 
+              <button
                 onClick={() => window.location.reload()}
                 className="text-xs bg-gray-100 px-4 py-2 rounded-lg font-black uppercase"
               >
@@ -106,7 +108,7 @@ const MainContent = () => {
 
               <div className="flex flex-col">
                 {isHome && sections[0] && (
-                  <HorizontalCategory category={sections[0]} allProducts={allProducts} />
+                  <HorizontalCategory category={sections[0]} allProducts={allProducts} seed={seedRef.current} />
                 )}
 
                 {rows.map((row, idx) => (
@@ -117,26 +119,43 @@ const MainContent = () => {
                       ))}
                     </div>
                     {isHome && idx === 0 && sections[1] && (
-                      <HorizontalCategory category={sections[1]} allProducts={allProducts} />
+                      <HorizontalCategory category={sections[1]} allProducts={allProducts} seed={seedRef.current + 1} />
                     )}
                   </div>
                 ))}
 
-                {products.length === 0 && (
+                {products.length === 0 && !loading && (
                   <div className="text-center py-20">
                     <p className="text-gray-400 font-bold uppercase text-sm tracking-widest">No se encontraron productos</p>
                   </div>
                 )}
               </div>
+
+              {isHome && pagination?.hasNext && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="flex items-center gap-2 px-8 py-3 bg-white border border-gray-200 rounded-full text-sm font-black uppercase tracking-tighter text-gray-700 hover:border-primary hover:text-primary transition-all shadow-sm disabled:opacity-60"
+                  >
+                    {loadingMore ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                    {loadingMore ? 'Cargando...' : 'Cargar más negocios'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       </main>
 
-      <InstallToast 
-        isVisible={isVisible} 
-        onInstall={handleInstall} 
-        onClose={closeToast} 
+      <InstallToast
+        isVisible={isVisible}
+        onInstall={handleInstall}
+        onClose={closeToast}
       />
     </div>
   )

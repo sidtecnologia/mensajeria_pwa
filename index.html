@@ -62,16 +62,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+      window.__pwaPrompt = null;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__pwaPrompt = e;
+      });
+    </script>
   </head>
-  <body className="antialiased overflow-x-hidden">
+  <body class="antialiased overflow-x-hidden">
     <div id="root"></div>
     
     <script type="module" src="/src/main.jsx"></script>
     
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function() {});
         });
       }
     </script>

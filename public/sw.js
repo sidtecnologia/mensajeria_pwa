@@ -1,4 +1,4 @@
-const CACHE_NAME = 't-traigo-v1.2.1';
+const CACHE_NAME = 't-traigo-v1.2.3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,33 +7,39 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) return response;
-        return fetch(event.request);
-      })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then(keys =>
+        Promise.all(
+          keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        )
+      )
+    ])
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      const network = fetch(event.request).then(response => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      });
+      return cached || network;
     })
   );
 });
