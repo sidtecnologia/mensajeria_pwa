@@ -7,7 +7,7 @@ import BusinessLogos from './components/BusinessLogos'
 import HorizontalCategory from './components/HorizontalCategory'
 import InstallToast from './components/InstallToast'
 import { usePWAInstall } from './hooks/usePWAInstall'
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2, Flame } from 'lucide-react'
 
 const Categories = ({ categories, selected, onSelect }) => (
   <div className="flex gap-3 overflow-x-auto pb-4 pt-2 px-4 scrollbar-hide">
@@ -49,9 +49,10 @@ const MainContent = () => {
 
   useEffect(() => {
     searchProducts(searchTerm, selectedCategory)
-  }, [searchTerm, selectedCategory, allProducts])
+  }, [searchTerm, selectedCategory, allProducts, searchProducts])
 
   const isHome = !searchTerm && selectedCategory === 'Todo'
+  
   const rows = useMemo(() => {
     const res = []
     for (let i = 0; i < products.length; i += 8) res.push(products.slice(i, i + 8))
@@ -75,8 +76,17 @@ const MainContent = () => {
             <div className="text-center py-20 text-red-500 font-bold bg-white rounded-3xl shadow-sm border border-red-50">{error}</div>
           ) : (
             <div className="mt-6">
-              <h2 className="text-xl font-black text-gray-800 flex items-center gap-2 mb-6 uppercase tracking-tighter">
-                {isHome ? <><Sparkles className="text-yellow-500 w-5 h-5" /> RECOMENDADOS</> : `RESULTADOS (${products.length})`}
+              <h2 className="text-xl font-black text-gray-800 flex items-center gap-3 mb-6 uppercase tracking-tighter">
+                {isHome ? (
+                  <>
+                    <div className="bg-orange-100 p-1.5 rounded-lg">
+                      <Flame className="text-orange-600 w-5 h-5 fill-orange-600" />
+                    </div>
+                    RECOMENDADOS
+                  </>
+                ) : (
+                  `RESULTADOS (${products.length})`
+                )}
               </h2>
               <div className="flex flex-col">
                 {isHome && sections[0] && <HorizontalCategory category={sections[0]} allProducts={allProducts} />}
@@ -104,4 +114,4 @@ const App = () => (
   </SearchProvider>
 )
 
-export default App
+export default App;

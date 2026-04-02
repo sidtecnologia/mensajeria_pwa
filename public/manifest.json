@@ -1,21 +1,21 @@
 {
-  "short_name": "T! Traigo",
   "name": "T! Traigo Comida",
-  "icons": [
-    {
-      "src": "https://traigocomida.vercel.app/og-image.jpg",
-      "sizes": "512x512",
-      "type": "image/jpg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://traigocomida.vercel.app/og-image.jpg",
-      "sizes": "512x512",
-      "type": "image/jpg"
-    }
-  ],
+  "short_name": "T! Traigo App",
   "start_url": ".",
   "display": "standalone",
+  "background_color": "#ffffff",
   "theme_color": "#0c6839",
-  "background_color": "#ffffff"
+  "description": "Pide la mejor comida de todo el Socorro",
+  "icons": [
+    {
+      "src": "/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
