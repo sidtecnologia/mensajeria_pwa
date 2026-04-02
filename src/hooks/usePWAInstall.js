@@ -4,45 +4,52 @@ const DISMISSED_KEY = 'pwa_install_dismissed'
 const TOAST_DURATION_MS = 10000
 
 export const usePWAInstall = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState(() => window.__pwaPrompt || null)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [isVisible, setIsVisible] = useState(false)
   const timerRef = useRef(null)
 
   useEffect(() => {
     if (localStorage.getItem(DISMISSED_KEY)) return
 
-    const show = (e) => {
-      setDeferredPrompt(e)
+    const show = (prompt) => {
+      setDeferredPrompt(prompt)
       setIsVisible(true)
       clearTimeout(timerRef.current)
       timerRef.current = setTimeout(() => setIsVisible(false), TOAST_DURATION_MS)
     }
 
-    if (window.__pwaPrompt) {
-      show(window.__pwaPrompt)
+    if (window.deferredPrompt) {
+      show(window.deferredPrompt)
     }
 
-    const handler = (e) => {
+    const onReady = () => {
+      if (window.deferredPrompt) show(window.deferredPrompt)
+    }
+
+    const onNative = (e) => {
       e.preventDefault()
-      window.__pwaPrompt = e
+      window.deferredPrompt = e
       show(e)
     }
 
-    window.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener('deferredPromptReady', onReady)
+    window.addEventListener('beforeinstallprompt', onNative)
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('deferredPromptReady', onReady)
+      window.removeEventListener('beforeinstallprompt', onNative)
       clearTimeout(timerRef.current)
     }
   }, [])
 
   const handleInstall = useCallback(async () => {
-    if (!deferredPrompt) return
+    const prompt = deferredPrompt || window.deferredPrompt
+    if (!prompt) return
     clearTimeout(timerRef.current)
     setIsVisible(false)
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-    window.__pwaPrompt = null
+    prompt.prompt()
+    const { outcome } = await prompt.userChoice
+    window.deferredPrompt = null
     setDeferredPrompt(null)
     if (outcome === 'accepted') {
       localStorage.setItem(DISMISSED_KEY, '1')
