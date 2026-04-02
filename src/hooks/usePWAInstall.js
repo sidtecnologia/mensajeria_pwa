@@ -18,38 +18,38 @@ export const usePWAInstall = () => {
       timerRef.current = setTimeout(() => setIsVisible(false), TOAST_DURATION_MS)
     }
 
-    if (window.deferredPrompt) {
-      show(window.deferredPrompt)
+    if (window.__pwaPrompt) {
+      show(window.__pwaPrompt)
     }
 
     const onReady = () => {
-      if (window.deferredPrompt) show(window.deferredPrompt)
+      if (window.__pwaPrompt) show(window.__pwaPrompt)
     }
 
     const onNative = (e) => {
       e.preventDefault()
-      window.deferredPrompt = e
+      window.__pwaPrompt = e
       show(e)
     }
 
-    window.addEventListener('deferredPromptReady', onReady)
+    window.addEventListener('pwaPromptReady', onReady)
     window.addEventListener('beforeinstallprompt', onNative)
 
     return () => {
-      window.removeEventListener('deferredPromptReady', onReady)
+      window.removeEventListener('pwaPromptReady', onReady)
       window.removeEventListener('beforeinstallprompt', onNative)
       clearTimeout(timerRef.current)
     }
   }, [])
 
   const handleInstall = useCallback(async () => {
-    const prompt = deferredPrompt || window.deferredPrompt
+    const prompt = deferredPrompt || window.__pwaPrompt
     if (!prompt) return
     clearTimeout(timerRef.current)
     setIsVisible(false)
     prompt.prompt()
     const { outcome } = await prompt.userChoice
-    window.deferredPrompt = null
+    window.__pwaPrompt = null
     setDeferredPrompt(null)
     if (outcome === 'accepted') {
       localStorage.setItem(DISMISSED_KEY, '1')

@@ -7,7 +7,7 @@ import BusinessLogos from './components/BusinessLogos'
 import HorizontalCategory from './components/HorizontalCategory'
 import InstallToast from './components/InstallToast'
 import { usePWAInstall } from './hooks/usePWAInstall'
-import { stableShuffle, getSessionSeed } from './utils/shuffle'
+import { stableShuffle } from './utils/shuffle'
 import { Loader2, Flame, ChevronDown } from 'lucide-react'
 
 const Categories = ({ categories, selected, onSelect }) => (
@@ -39,7 +39,7 @@ const MainContent = () => {
   const { isVisible, handleInstall, closeToast } = usePWAInstall()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todo')
-  const seedRef = useRef(getSessionSeed())
+  const seedRef = useRef(Math.floor(Math.random() * 1e9))
 
   const categories = useMemo(() => {
     return [...new Set(allProducts.map(p => p.category))].filter(Boolean).sort()
