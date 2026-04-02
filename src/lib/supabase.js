@@ -1,13 +1,10 @@
-import { createClient } from '@supabase/supabase-api'
+import { createClient } from '@supabase/supabase-js'
 
 const CENTRAL_URL = import.meta.env.VITE_CENTRAL_SUPABASE_URL
 const CENTRAL_KEY = import.meta.env.VITE_CENTRAL_SUPABASE_ANON_KEY
 
-export const supabaseCentral = createClient(CENTRAL_URL, CENTRAL_KEY)
+if (!CENTRAL_URL || !CENTRAL_KEY) {
+  console.error("ERROR: Variables de entorno de Supabase no encontradas.")
+}
 
-export const restaurants = [
-  { id: 'negocio1', url: import.meta.env.VITE_RESTAURANT_1_URL, key: import.meta.env.VITE_RESTAURANT_1_KEY, name: 'Restaurante A' },
-  { id: 'negocio2', url: import.meta.env.VITE_RESTAURANT_2_URL, key: import.meta.env.VITE_RESTAURANT_2_KEY, name: 'Restaurante B' }
-]
-
-export const getRestaurantClient = (config) => createClient(config.url, config.key)
+export const supabase = createClient(CENTRAL_URL, CENTRAL_KEY)

@@ -1,12 +1,12 @@
 const ProductCard = ({ product }) => {
-  const isOutOfStock = product.stock <= 0;
+  const isOutOfStock = product.stock <= 0
 
   const handleClick = () => {
-    if (isOutOfStock) return;
-    const url = new URL(product.business_url);
-    url.searchParams.set('p', product.id);
-    window.location.href = url.toString();
-  };
+    if (isOutOfStock) return
+    const url = new URL(product.business_url)
+    url.searchParams.set('p', product.id)
+    window.location.href = url.toString()
+  }
 
   return (
     <div 
@@ -28,6 +28,12 @@ const ProductCard = ({ product }) => {
         )}
       </div>
 
+      <div className="absolute top-2 right-2 z-10">
+        <span className="bg-white/90 backdrop-blur-sm text-gray-700 text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm border border-gray-100 uppercase">
+          {product.business_name}
+        </span>
+      </div>
+
       <img 
         src={product.image?.[0] || '/img/placeholder.png'} 
         className="w-full aspect-square object-cover" 
@@ -37,20 +43,18 @@ const ProductCard = ({ product }) => {
       
       <div className="p-3 flex flex-col flex-grow">
         <h3 className="font-bold text-sm text-gray-800 line-clamp-1">{product.name}</h3>
-        
-        <p className="text-gray-500 text-[11px] mt-1 line-clamp-3 flex-grow">
+        <p className="text-gray-500 text-[11px] mt-1 line-clamp-2 flex-grow">
           {product.description || 'Sin descripción disponible'}
         </p>
-
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">
-          <p className="text-primary font-bold text-sm">${product.price?.toLocaleString()}</p>
-          <span className="text-[10px] text-gray-400 font-medium truncate ml-2">
-            {product.business_name}
+          <span className="text-primary font-black text-base">
+            ${new Intl.NumberFormat('es-CO').format(product.price)}
           </span>
+          {isOutOfStock && <span className="text-[10px] text-red-500 font-bold uppercase">Agotado</span>}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProductCard;
+export default ProductCard

@@ -1,55 +1,33 @@
-import { businessesConfig } from '../lib/businesses';
+import { useSearch } from '../context/SearchContext'
 
 const BusinessLogos = () => {
-  const businesses = businessesConfig.filter(b => b.supabaseUrl && b.slug_url);
+  const { businesses, loading } = useSearch()
 
-  const buildCandidates = (b) => {
-    const base = b.supabaseUrl?.replace(/\/$/, '') || '';
-    const imagesPath = `${base}/storage/v1/object/public/images/favicon.png`;
-    const dondePath = `${base}/storage/v1/object/public/donde_peter/favicon.png`;
-    const prefersDonde = b.id === 'negocio-1' || (b.name || '').toLowerCase().includes('peter') || (b.slug_url || '').includes('comidarapida');
-    return prefersDonde ? [dondePath, imagesPath] : [imagesPath, dondePath];
-  };
+  if (loading || !businesses || businesses.length === 0) return null
 
   return (
-    <div className="bg-white">
-      <div className="max-w-6xl mx-auto px-4 py-3">
-        <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide touch-scroll py-2">
-          {businesses.map(b => {
-            const [primary, fallback] = buildCandidates(b);
-            return (
-              <a
-                key={b.id}
-                href={b.slug_url}
-                rel="noopener noreferrer"
-                className="flex-shrink-0 logo-item"
-                aria-label={b.name}
-              >
+    <div className="bg-white border-b border-gray-100">
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide py-2">
+          {businesses.map(b => (
+            <a key={b.id} href={b.slug_url} className="flex-shrink-0 group flex flex-col items-center gap-2">
+              <div className="relative">
                 <img
-                  src={primary}
-                  data-fallback={fallback}
+                  src={b.logo_url || '/img/placeholder.png'}
                   alt={b.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    const el = e.currentTarget;
-                    const next = el.getAttribute('data-fallback');
-                    if (next && el.src !== next) {
-                      el.src = next;
-                      el.removeAttribute('data-fallback');
-                    } else {
-                      el.src = '/img/placeholder.png';
-                      el.removeAttribute('data-fallback');
-                    }
-                  }}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-gray-100 shadow-sm"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm group-hover:border-primary transition-all"
+                  onError={(e) => { e.target.src = '/img/placeholder.png' }}
                 />
-              </a>
-            );
-          })}
+              </div>
+              <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">
+                {b.name}
+              </span>
+            </a>
+          ))}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BusinessLogos;
+export default BusinessLogos

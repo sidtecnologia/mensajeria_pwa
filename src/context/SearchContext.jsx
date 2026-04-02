@@ -1,106 +1,82 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { businessesConfig } from '../lib/businesses';
+import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
-const SearchContext = createContext();
-
-const clients = businessesConfig
-  .filter(b => b.supabaseUrl && b.supabaseKey)
-  .map(business => ({
-    ...business,
-    client: createClient(business.supabaseUrl, business.supabaseKey, {
-      auth: { persistSession: false }
-    })
-  }));
+const SearchContext = createContext()
 
 export const SearchProvider = ({ children }) => {
-  const [allProducts, setAllProducts] = useState([]);
-  const [displayProducts, setDisplayProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [allProducts, setAllProducts] = useState([])
+  const [displayProducts, setDisplayProducts] = useState([])
+  const [banners, setBanners] = useState([])
+  const [businesses, setBusinesses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const excludedCategories = ['Aderezo', 'Adicional'];
-
-  const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
+  const shuffle = (array) => [...array].sort(() => Math.random() - 0.5)
 
   const generateHomeLayout = (productsPool) => {
-    const categoriesMap = {};
-    const shuffledPool = shuffle(productsPool).sort((a, b) => b.business_priority - a.business_priority);
-    
-    shuffledPool.forEach(p => {
-      if (!categoriesMap[p.category]) categoriesMap[p.category] = [];
-      if (categoriesMap[p.category].length < 3) {
-        categoriesMap[p.category].push(p);
+    if (!productsPool.length) return []
+    const categoriesMap = {}
+    productsPool.forEach(p => {
+      if (!categoriesMap[p.category]) categoriesMap[p.category] = []
+      if (categoriesMap[p.category].length < 4) {
+        categoriesMap[p.category].push(p)
       }
-    });
-
-    const homeProducts = Object.values(categoriesMap).flat();
-    return shuffle(homeProducts).slice(0, 24);
-  };
-
-  const searchProducts = async (searchTerm = '', category = 'Todo') => {
-    if (!searchTerm && category === 'Todo') {
-      setDisplayProducts(generateHomeLayout(allProducts));
-      return;
-    }
-
-    let filtered = allProducts;
-    if (category !== 'Todo') {
-      filtered = filtered.filter(p => p.category === category);
-    }
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(term) || 
-        p.description?.toLowerCase().includes(term) ||
-        p.business_name.toLowerCase().includes(term) ||
-        p.category?.toLowerCase().includes(term)
-      );
-    }
-    setDisplayProducts(filtered);
-  };
+    })
+    return shuffle(Object.values(categoriesMap).flat()).slice(0, 32)
+  }
 
   const initData = async () => {
-    setLoading(true);
     try {
-      const promises = clients.map(async (business) => {
-        const { data } = await business.client
-          .from('products')
-          .select('id, name, description, price, image, category, stock, isOffer, featured')
-          .gt('stock', 0)
-          .limit(100);
-        
-        return (data || []).map(p => ({
-          ...p,
-          business_id: business.id,
-          business_name: business.name,
-          business_url: business.slug_url,
-          business_priority: business.priority
-        }));
-      });
+      setLoading(true)
+      const { data, error: funcError } = await supabase.functions.invoke('get-global-catalog')
+      
+      if (funcError) throw funcError
 
-      const results = await Promise.allSettled(promises);
-      const loaded = results
-        .filter(r => r.status === 'fulfilled')
-        .flatMap(r => r.value)
-        .filter(p => !excludedCategories.includes(p.category));
+      const prods = data?.products || []
+      const brands = data?.businesses || []
+      const bans = data?.banners || []
 
-      setAllProducts(loaded);
-      setDisplayProducts(generateHomeLayout(loaded));
+      setAllProducts(prods)
+      setBusinesses(brands)
+      setBanners(bans)
+      setDisplayProducts(generateHomeLayout(prods))
+      setError(null)
     } catch (err) {
-      setError('Error al cargar datos');
+      setError('Error al cargar catálogo')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  useEffect(() => { initData(); }, []);
+  const searchProducts = (term = '', category = 'Todo') => {
+    let filtered = allProducts
+    if (category !== 'Todo') filtered = filtered.filter(p => p.category === category)
+    if (term) {
+      const t = term.toLowerCase()
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(t) || 
+        p.business_name.toLowerCase().includes(t)
+      )
+    }
+    setDisplayProducts(term === '' && category === 'Todo' ? generateHomeLayout(allProducts) : filtered)
+  }
+
+  useEffect(() => { initData() }, [])
 
   return (
-    <SearchContext.Provider value={{ products: displayProducts, loading, error, searchProducts, allProducts }}>
+    <SearchContext.Provider value={{ 
+      products: displayProducts, 
+      banners, 
+      businesses,
+      loading, 
+      error, 
+      searchProducts, 
+      allProducts, 
+      refresh: initData 
+    }}>
       {children}
     </SearchContext.Provider>
-  );
-};
+  )
+}
 
-export const useSearch = () => useContext(SearchContext);
+export const useSearch = () => useContext(SearchContext)
