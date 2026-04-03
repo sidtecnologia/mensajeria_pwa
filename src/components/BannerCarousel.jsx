@@ -19,10 +19,19 @@ const BannerCarousel = ({ images }) => {
 
   return (
     <div
-      className="relative w-full aspect-[21/9] md:aspect-[25/7] overflow-hidden bg-gray-200"
+      className="relative w-full overflow-hidden bg-gray-200"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      <img
+        src={images[currentIndex]}
+        alt=""
+        className="w-full h-auto block invisible"
+        loading="eager"
+        decoding="async"
+        aria-hidden="true"
+      />
+
       {images.map((img, index) => (
         <img
           key={index}
@@ -37,7 +46,7 @@ const BannerCarousel = ({ images }) => {
       ))}
 
       {images.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
           {images.map((_, index) => (
             <button
               key={index}

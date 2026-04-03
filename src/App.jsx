@@ -6,7 +6,9 @@ import BannerCarousel from './components/BannerCarousel'
 import BusinessLogos from './components/BusinessLogos'
 import HorizontalCategory from './components/HorizontalCategory'
 import InstallToast from './components/InstallToast'
+import UpdateToast from './components/UpdateToast'
 import { usePWAInstall } from './hooks/usePWAInstall'
+import { useServiceWorker } from './hooks/useServiceWorker'
 import { stableShuffle } from './utils/shuffle'
 import { Loader2, Flame, ChevronDown } from 'lucide-react'
 
@@ -37,9 +39,15 @@ const Categories = ({ categories, selected, onSelect }) => (
 const MainContent = () => {
   const { products, banners, loading, loadingMore, error, searchProducts, allProducts, loadMore, pagination } = useSearch()
   const { isVisible, handleInstall, closeToast } = usePWAInstall()
+  const { hasUpdate, applyUpdate } = useServiceWorker()
+  const [showUpdateToast, setShowUpdateToast] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todo')
   const seedRef = useRef(Math.floor(Math.random() * 1e9))
+
+  useEffect(() => {
+    if (hasUpdate) setShowUpdateToast(true)
+  }, [hasUpdate])
 
   const categories = useMemo(() => {
     return [...new Set(allProducts.map(p => p.category))].filter(Boolean).sort()
@@ -156,6 +164,12 @@ const MainContent = () => {
         isVisible={isVisible}
         onInstall={handleInstall}
         onClose={closeToast}
+      />
+
+      <UpdateToast
+        isVisible={showUpdateToast}
+        onUpdate={applyUpdate}
+        onClose={() => setShowUpdateToast(false)}
       />
     </div>
   )
