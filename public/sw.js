@@ -66,3 +66,33 @@ self.addEventListener('message', (event) => {
     self.skipWaiting()
   }
 })
+
+self.addEventListener('push', (event) => {
+  let data = { title: 'T! Traigo', body: 'Tenés una nueva notificación', url: '/', icon: '/img/icon-192.png' }
+  try {
+    if (event.data) data = { ...data, ...JSON.parse(event.data.text()) }
+  } catch {}
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: '/img/icon-192.png',
+      data: { url: data.url },
+      vibrate: [100, 50, 100],
+    })
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = event.notification.data?.url || '/'
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === url && 'focus' in client) return client.focus()
+      }
+      if (clients.openWindow) return clients.openWindow(url)
+    })
+  )
+})

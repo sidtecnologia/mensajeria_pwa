@@ -7,8 +7,10 @@ import BusinessLogos from './components/BusinessLogos'
 import HorizontalCategory from './components/HorizontalCategory'
 import InstallToast from './components/InstallToast'
 import UpdateToast from './components/UpdateToast'
+import PushToast from './components/PushToast'
 import { usePWAInstall } from './hooks/usePWAInstall'
 import { useServiceWorker } from './hooks/useServiceWorker'
+import { usePushNotifications } from './hooks/usePushNotifications'
 import { stableShuffle } from './utils/shuffle'
 import { Loader2, Flame, ChevronDown } from 'lucide-react'
 
@@ -40,6 +42,7 @@ const MainContent = () => {
   const { products, banners, loading, loadingMore, error, searchProducts, allProducts, loadMore, pagination } = useSearch()
   const { isVisible, handleInstall, closeToast } = usePWAInstall()
   const { hasUpdate, applyUpdate } = useServiceWorker()
+  const { showToast: showPushToast, subscribe, dismissToast, loading: pushLoading } = usePushNotifications()
   const [showUpdateToast, setShowUpdateToast] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Todo')
@@ -170,6 +173,13 @@ const MainContent = () => {
         isVisible={showUpdateToast}
         onUpdate={applyUpdate}
         onClose={() => setShowUpdateToast(false)}
+      />
+
+      <PushToast
+        isVisible={showPushToast}
+        onSubscribe={subscribe}
+        onClose={dismissToast}
+        loading={pushLoading}
       />
     </div>
   )
