@@ -68,16 +68,27 @@ self.addEventListener('message', (event) => {
 })
 
 self.addEventListener('push', (event) => {
-  let data = { title: 'T! Traigo', body: 'Tenés una nueva notificación', url: '/', icon: '/img/icon-192.png' }
+  let data = { 
+    title: 'T! Traigo', 
+    body: 'Tenés una nueva notificación', 
+    url: '/', 
+    icon: '/img/favicon.png',
+    image: null 
+  }
+  
   try {
-    if (event.data) data = { ...data, ...JSON.parse(event.data.text()) }
-  } catch {}
+    if (event.data) {
+      const payload = JSON.parse(event.data.text())
+      data = { ...data, ...payload }
+    }
+  } catch (e) {}
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: data.icon,
-      badge: '/img/icon-192.png',
+      image: data.image,
+      badge: '/img/favicon.png',
       data: { url: data.url },
       vibrate: [100, 50, 100],
     })
