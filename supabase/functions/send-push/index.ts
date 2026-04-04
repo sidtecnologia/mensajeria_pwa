@@ -15,86 +15,102 @@ serve(async (req) => {
     const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') ?? ''
     const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:admin@ttraigo.com'
     const ADMIN_SECRET = Deno.env.get('ADMIN_PANEL_SECRET') ?? ''
+    const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
     const authHeader = req.headers.get('x-admin-secret')
-    if (authHeader !== ADMIN_SECRET) {
+    const authBearer = req.headers.get('Authorization')?.split(' ')[1]
+
+    if (authHeader !== ADMIN_SECRET && authBearer !== SERVICE_ROLE) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders })
     }
 
-    const { title, body, url, icon } = await req.json()
-    if (!title || !body) {
-      return new Response(JSON.stringify({ error: 'title and body are required' }), { status: 400, headers: corsHeaders })
-    }
-
-    const supabaseAdmin = createClient(
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      SERVICE_ROLE
     )
 
-    const { data: subscriptions, error: dbError } = await supabaseAdmin
-      .from('push_subscriptions')
-      .select('id, endpoint, p256dh, auth')
+    const bodyJson = await req.json().catch(() => ({}))
+    let notificationsToSend = []
 
-    if (dbError) throw dbError
-    if (!subscriptions || subscriptions.length === 0) {
-      return new Response(JSON.stringify({ sent: 0, message: 'No subscriptions found' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    if (bodyJson.is_scheduler) {
+      const now = new Date().toISOString()
+      const { data: jobs } = await supabase
+        .from('push_jobs')
+        .select('*')
+        .eq('status', 'pending')
+        .lte('scheduled_for', now)
+
+      if (jobs && jobs.length > 0) {
+        notificationsToSend = jobs
+      }
+    } else {
+      notificationsToSend = [bodyJson]
     }
 
-    webPush.setVapidDetails(
-      VAPID_SUBJECT,
-      VAPID_PUBLIC_KEY,
-      VAPID_PRIVATE_KEY
-    )
+    if (notificationsToSend.length === 0) {
+      return new Response(JSON.stringify({ message: 'No tasks' }), { headers: corsHeaders })
+    }
 
-    const payload = JSON.stringify({
-      title,
-      body,
-      url: url || '/',
-      icon: icon || '/img/favicon.png'
-    })
+    const { data: subs } = await supabase.from('push_subscriptions').select('id, endpoint, p256dh, auth')
+    
+    if (!subs || subs.length === 0) {
+      return new Response(JSON.stringify({ sent: 0, message: 'No subs' }), { headers: corsHeaders })
+    }
 
-    const expiredIds: string[] = []
-    let sent = 0
+    webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
-    await Promise.all(
-      subscriptions.map(async (sub) => {
+    const results = await Promise.all(notificationsToSend.map(async (notif) => {
+      const payload = JSON.stringify({
+        title: notif.title,
+        body: notif.body,
+        url: notif.url || '/',
+        image: notif.image || null,
+        icon: notif.icon || 'https://ttraigo.com/logo.png',
+        badge: 'https://ttraigo.com/badge.png'
+      })
+
+      let sentCount = 0
+      const expired = []
+
+      for (const sub of subs) {
         try {
           const res = await webPush.sendNotification(
-            {
-              endpoint: sub.endpoint,
-              keys: {
-                p256dh: sub.p256dh,
-                auth: sub.auth,
-              },
-            },
+            { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
             payload
           )
-
-          if (res.statusCode === 201 || res.statusCode === 200) {
-            sent++
-          }
+          if (res.statusCode === 200 || res.statusCode === 201) sentCount++
         } catch (err) {
-          expiredIds.push(sub.id)
+          if (err.statusCode === 404 || err.statusCode === 410) {
+            expired.push(sub.id)
+          }
         }
-      })
-    )
+      }
 
-    if (expiredIds.length > 0) {
-      await supabaseAdmin.from('push_subscriptions').delete().in('id', expiredIds)
-    }
+      if (expired.length > 0) {
+        await supabase.from('push_subscriptions').delete().in('id', expired)
+      }
+
+      if (notif.id && bodyJson.is_scheduler) {
+        await supabase.from('push_jobs').update({ 
+          status: 'sent', 
+          last_sent_at: new Date().toISOString() 
+        }).eq('id', notif.id)
+      }
+
+      return sentCount
+    }))
+
+    const totalSent = results.reduce((a, b) => a + b, 0)
 
     return new Response(
-      JSON.stringify({ 
-        sent, 
-        expired_removed: expiredIds.length, 
-        total: subscriptions.length 
-      }),
+      JSON.stringify({ sent: totalSent, jobs_processed: notificationsToSend.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
+
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }), 
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: corsHeaders }
     )
   }
 })
