@@ -12,7 +12,7 @@ const UpdateToast = ({ isVisible, onUpdate, onClose }) => {
           </div>
           <div>
             <p className="text-sm font-black uppercase tracking-tight">Nueva versión disponible</p>
-            <p className="text-[11px] text-gray-400">Actualiza para ver los últimos cambios</p>
+            <p className="text-[11px] text-gray-400">Vamos a actualizar...</p>
           </div>
         </div>
 
@@ -21,7 +21,7 @@ const UpdateToast = ({ isVisible, onUpdate, onClose }) => {
             onClick={onUpdate}
             className="bg-white text-black text-[11px] font-black px-4 py-2 rounded-lg uppercase hover:bg-gray-200 active:scale-95 transition-all"
           >
-            Actualizar
+            Ahora
           </button>
           <button
             onClick={onClose}
