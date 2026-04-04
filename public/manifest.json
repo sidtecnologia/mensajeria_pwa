@@ -8,6 +8,7 @@
   "theme_color": "#0c6839",
   "orientation": "portrait",
   "scope": "/",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "/favicon.png",

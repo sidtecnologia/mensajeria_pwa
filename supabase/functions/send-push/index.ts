@@ -78,7 +78,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ sent: 0, message: 'No subscriptions found' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const payload = JSON.stringify({ title, body, url: url || '/', icon: icon || '/img/icon-192.png' })
+    const payload = JSON.stringify({ title, body, url: url || '/', icon: icon || '/img/favicon.png' })
     const expiredIds: string[] = []
     let sent = 0
 
