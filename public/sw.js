@@ -71,10 +71,10 @@ self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {}
   
   const options = {
-    body: data.body || 'Tenés una nueva notificación',
-    icon: data.icon || '/img/favicon.png',
+    body: data.body || 'Notificación',
+    icon: data.icon || '/favicon.png',
     image: data.image || null,
-    badge: data.badge || '/img/favicon.png',
+    badge: data.badge || '/favicon.png',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/' },
     tag: 'ttraigo-notification-tag',
