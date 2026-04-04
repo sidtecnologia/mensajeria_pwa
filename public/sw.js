@@ -68,42 +68,34 @@ self.addEventListener('message', (event) => {
 })
 
 self.addEventListener('push', (event) => {
-  let data = { 
-    title: 'T! Traigo', 
-    body: 'Tenés una nueva notificación', 
-    url: '/', 
-    icon: '/img/favicon.png',
-    image: null 
-  }
+  const data = event.data ? event.data.json() : {}
   
-  try {
-    if (event.data) {
-      const payload = JSON.parse(event.data.text())
-      data = { ...data, ...payload }
-    }
-  } catch (e) {}
+  const options = {
+    body: data.body || 'Tenés una nueva notificación',
+    icon: data.icon || '/img/favicon.png',
+    image: data.image || null,
+    badge: data.badge || '/img/favicon.png',
+    vibrate: [100, 50, 100],
+    data: { url: data.url || '/' },
+    tag: 'ttraigo-notification-tag',
+    renotify: true
+  }
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon,
-      image: data.image,
-      badge: '/img/favicon.png',
-      data: { url: data.url },
-      vibrate: [100, 50, 100],
-    })
+    self.registration.showNotification(data.title || 'T! Traigo', options)
   )
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = event.notification.data?.url || '/'
+  const targetUrl = new URL(event.notification.data?.url || '/', location.origin).href
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url === url && 'focus' in client) return client.focus()
+        if (client.url === targetUrl && 'focus' in client) return client.focus()
       }
-      if (clients.openWindow) return clients.openWindow(url)
+      if (clients.openWindow) return clients.openWindow(targetUrl)
     })
   )
 })
