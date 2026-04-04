@@ -1,48 +1,10 @@
 import { serve } from "std/http/server.ts"
 import { createClient } from "supabase"
+import webPush from "web-push"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-function base64UrlToUint8Array(base64UrlData: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64UrlData.length % 4)) % 4)
-  const base64 = (base64UrlData + padding).replace(/-/g, '+').replace(/_/g, '/')
-  const rawData = atob(base64)
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)))
-}
-
-async function importVapidPrivateKey(privateKeyB64: string): Promise<CryptoKey> {
-  const keyData = base64UrlToUint8Array(privateKeyB64)
-  return crypto.subtle.importKey(
-    'pkcs8',
-    keyData,
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    false,
-    ['sign']
-  )
-}
-
-async function buildVapidAuthHeader(audience: string, subject: string, publicKey: string, privateKeyB64: string): Promise<string> {
-  const expiration = Math.floor(Date.now() / 1000) + 12 * 3600
-  const header = { typ: 'JWT', alg: 'ES256' }
-  const payload = { aud: audience, exp: expiration, sub: subject }
-
-  const encode = (obj: object) => btoa(JSON.stringify(obj)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
-  const signingInput = `${encode(header)}.${encode(payload)}`
-
-  const privateKey = await importVapidPrivateKey(privateKeyB64)
-  const signature = await crypto.subtle.sign(
-    { name: 'ECDSA', hash: 'SHA-256' },
-    privateKey,
-    new TextEncoder().encode(signingInput)
-  )
-
-  const sigB64 = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
-  const token = `${signingInput}.${sigB64}`
-
-  return `vapid t=${token},k=${publicKey}`
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-secret',
 }
 
 serve(async (req) => {
@@ -78,32 +40,40 @@ serve(async (req) => {
       return new Response(JSON.stringify({ sent: 0, message: 'No subscriptions found' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const payload = JSON.stringify({ title, body, url: url || '/', icon: icon || '/img/favicon.png' })
+    webPush.setVapidDetails(
+      VAPID_SUBJECT,
+      VAPID_PUBLIC_KEY,
+      VAPID_PRIVATE_KEY
+    )
+
+    const payload = JSON.stringify({
+      title,
+      body,
+      url: url || '/',
+      icon: icon || '/img/favicon.png'
+    })
+
     const expiredIds: string[] = []
     let sent = 0
 
-    await Promise.allSettled(
+    await Promise.all(
       subscriptions.map(async (sub) => {
         try {
-          const audience = new URL(sub.endpoint).origin
-          const vapidAuth = await buildVapidAuthHeader(audience, VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
-
-          const res = await fetch(sub.endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/octet-stream',
-              'Authorization': vapidAuth,
-              'TTL': '86400',
+          const res = await webPush.sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: {
+                p256dh: sub.p256dh,
+                auth: sub.auth,
+              },
             },
-            body: new TextEncoder().encode(payload),
-          })
+            payload
+          )
 
-          if (res.status === 201 || res.status === 200) {
+          if (res.statusCode === 201 || res.statusCode === 200) {
             sent++
-          } else if (res.status === 404 || res.status === 410) {
-            expiredIds.push(sub.id)
           }
-        } catch {
+        } catch (err) {
           expiredIds.push(sub.id)
         }
       })
@@ -114,10 +84,17 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ sent, expired_removed: expiredIds.length, total: subscriptions.length }),
+      JSON.stringify({ 
+        sent, 
+        expired_removed: expiredIds.length, 
+        total: subscriptions.length 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    return new Response(
+      JSON.stringify({ error: error.message }), 
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 })
