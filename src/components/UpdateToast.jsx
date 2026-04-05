@@ -21,7 +21,7 @@ const UpdateToast = ({ isVisible, onUpdate, onClose }) => {
             onClick={onUpdate}
             className="bg-white text-black text-[11px] font-black px-4 py-2 rounded-lg uppercase hover:bg-gray-200 active:scale-95 transition-all"
           >
-            Ahora
+            OK
           </button>
           <button
             onClick={onClose}
