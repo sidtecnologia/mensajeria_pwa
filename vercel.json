@@ -5,7 +5,15 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://api.whatsapp.com; worker-src 'self' blob:; frame-src 'self' https://www.google.com; manifest-src 'self'; base-uri 'self'; form-action 'self' https://api.whatsapp.com; upgrade-insecure-requests; block-all-mixed-content;"
+          "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://api.whatsapp.com; worker-src 'self' blob:; frame-src 'self' https://www.google.com; manifest-src 'self'; base-uri 'self'; form-action 'self' https://api.whatsapp.com; upgrade-insecure-requests; block-all-mixed-content;"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Embedder-Policy",
+          "value": "require-corp"
         },
         {
           "key": "X-Content-Type-Options",

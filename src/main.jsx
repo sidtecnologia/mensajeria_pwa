@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.__pwaPrompt = null
+window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault()
-  window.deferredPrompt = e
-  window.dispatchEvent(new Event('deferredPromptReady'))
+  window.__pwaPrompt = e
+  window.dispatchEvent(new Event('pwaPromptReady'))
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -16,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 )
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function() {})
   })
 }

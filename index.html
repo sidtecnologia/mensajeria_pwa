@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://api.whatsapp.com; worker-src 'self' blob:; frame-src 'self' https://www.google.com; manifest-src 'self'; base-uri 'self'; form-action 'self' https://api.whatsapp.com; upgrade-insecure-requests; block-all-mixed-content;">
-    
     <title>T! Traigo | Comida a domicilio en El Socorro, Santander</title>
     <meta name="description" content="Pide comida de los mejores restaurantes en Socorro. Menú centralizado, entrega rápida y el mejor servicio con T! Traigo." />
     <meta name="keywords" content="domicilios Socorro, restaurantes Socorro Santander, T! Traigo, pedir comida Socorro, traigocomida" />
@@ -62,27 +60,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-      window.__pwaPrompt = null;
-      window.addEventListener('beforeinstallprompt', function(e) {
-        e.preventDefault();
-        window.__pwaPrompt = e;
-        window.dispatchEvent(new Event('pwaPromptReady'));
-      });
-    </script>
   </head>
   <body class="antialiased overflow-x-hidden">
     <div id="root"></div>
-    
     <script type="module" src="/src/main.jsx"></script>
-    
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js').catch(function() {});
-        });
-      }
-    </script>
   </body>
 </html>
