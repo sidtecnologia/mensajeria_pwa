@@ -76,8 +76,20 @@ const MainContent = () => {
     return res
   }, [products])
 
+  const h1Text = useMemo(() => {
+    if (searchTerm) {
+      return `Resultados de búsqueda: ${searchTerm} en Socorro, Santander`
+    }
+    if (selectedCategory !== 'Todo') {
+      return `${selectedCategory} a domicilio en Socorro, Santander | T! Traigo`
+    }
+    return 'Comida a Domicilio en Socorro, Santander | T! Traigo - Restaurantes y Menús'
+  }, [searchTerm, selectedCategory])
+
   return (
     <div className="min-h-screen bg-gray-50 pb-10 font-sans text-gray-900">
+      <h1 className="sr-only">{h1Text}</h1>
+      
       <Navbar onSearch={setSearchTerm} value={searchTerm} />
 
       <main>
