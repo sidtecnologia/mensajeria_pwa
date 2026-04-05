@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+Allow: /menu
+Allow: /restaurantes
+Allow: /categorias/
+Allow: /nosotros
+Allow: /contacto
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+Disallow: /sw.js
+Disallow: /workbox-*.js
+Disallow: /manifest.json
+
+User-agent: Googlebot
+Allow: /
+Allow: /img/
+Allow: /assets/
+Crawl-delay: 0
+
+User-agent: Googlebot-Image
+Allow: /img/
+Allow: /assets/
+
+User-agent: bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Crawl-delay: 2
+
+Sitemap: https://traigocomida.vercel.app/sitemap.xml
